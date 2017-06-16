@@ -117,7 +117,7 @@
     {
       "type": "Microsoft.Network/loadBalancers",
       "name": "[variables('adLBName')]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2015-06-15",
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
@@ -157,7 +157,7 @@
     {
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[variables('adNicName')]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2015-06-15",
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "Microsoft.Resources/deployments/VNet",
