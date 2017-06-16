@@ -234,7 +234,7 @@
               "name": "[concat(variables('adVMName'), '-data-disk')]",
               "caching": "None",
               "createOption": "Empty",
-              "diskSizeGB": "1000",
+              "diskSizeGB": "50",
               "lun": 0
             }
           ]
