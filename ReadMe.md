@@ -1,1 +1,0 @@
-Azure Stack Compatible Templates
