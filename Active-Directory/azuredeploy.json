@@ -90,7 +90,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "name": "VNet",
+      "name": "VNet2",
       "apiVersion": "2016-02-01",
       "properties": {
         "mode": "Incremental",
