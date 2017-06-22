@@ -26,6 +26,12 @@
         "description": "The DNS prefix for the public IP address used by the Load Balancer"
       }
     },
+    "samslmediaip": {
+      "type": "string",
+      "metadata": {
+        "description": "The IP address of samslmedia.blob.local.azurestack.external"
+      }
+    },
     "_artifactsLocation": {
       "type": "string",
       "metadata": {
@@ -270,7 +276,8 @@
                 "AdminCreds": {
                   "UserName": "[parameters('adminUsername')]",
                   "Password": "PrivateSettingsRef:AdminPassword"
-                }
+                },
+                "SaMslMediaIP": "[parameters('samslmediaip')]"
               }
             },
             "protectedSettings": {
