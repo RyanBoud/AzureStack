@@ -199,6 +199,7 @@
         "[resourceId('Microsoft.Compute/availabilitySets', variables('adAvailabilitySetName'))]",
         "[resourceId('Microsoft.Network/loadBalancers', variables('adLBName'))]"
       ],
+
       "properties": {
         "hardwareProfile": {
           "vmSize": "Standard_D1_v2"
