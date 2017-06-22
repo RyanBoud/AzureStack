@@ -7,12 +7,15 @@
 
         [Parameter(Mandatory)]
         [System.Management.Automation.PSCredential]$Admincreds,
+		
+		[Parameter(Mandatory)]
+		[string]$SaMslMediaIP,
 
         [Int]$RetryCount=20,
         [Int]$RetryIntervalSec=30
     ) 
     
-    Import-DscResource -ModuleName xActiveDirectory, xStorage, xNetworking, PSDesiredStateConfiguration, xPendingReboot
+    Import-DscResource -ModuleName xActiveDirectory, xStorage, xNetworking, PSDesiredStateConfiguration, xPendingReboot, xDnsServer
     [System.Management.Automation.PSCredential ]$DomainCreds = New-Object System.Management.Automation.PSCredential ("${DomainName}\$($Admincreds.UserName)", $Admincreds.Password)
     $Interface=Get-NetAdapter|Where Name -Like "Ethernet*"|Select-Object -First 1
     $InterfaceAlias=$($Interface.Name)
@@ -55,6 +58,24 @@
             AddressFamily  = 'IPv4'
 	        DependsOn = "[WindowsFeature]DNS"
         }
+		
+		xDnsServerPrimaryZone addPrimaryZone
+		{
+			Ensure        = 'Present'
+			Name          = "blob.local.azurestack.external"
+			ZoneFile      = ""
+			DynamicUpdate = "None"
+		}
+		
+		xDnsRecord TestRecord
+		{
+			Name = "samslmedia"
+			Target = $SaMslMediaIP
+			Zone = "blob.local.azurestack.external"
+			Type = "ARecord"
+			Ensure = "Present"
+		}
+		
 
         xWaitforDisk Disk2
         {
