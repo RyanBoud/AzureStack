@@ -32,6 +32,12 @@
         "description": "The IP address of samslmedia.blob.local.azurestack.external"
       }
     },
+    "AdminManagementIP": {
+      "type": "string",
+      "metadata": {
+        "description": "The IP address of adminmanagement.local.azurestack.external"
+      }
+    },
     "_artifactsLocation": {
       "type": "string",
       "metadata": {
@@ -277,7 +283,8 @@
                   "UserName": "[parameters('adminUsername')]",
                   "Password": "PrivateSettingsRef:AdminPassword"
                 },
-                "SaMslMediaIP": "[parameters('samslmediaip')]"
+                "SaMslMediaIP": "[parameters('samslmediaip')]",
+                "AdminManagementIP": "[parameters('AdminManagementIP')]"
               }
             },
             "protectedSettings": {
