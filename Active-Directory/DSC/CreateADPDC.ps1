@@ -63,7 +63,7 @@
 		{
 			Ensure        = 'Present'
 			Name          = "blob.local.azurestack.external"
-			ZoneFile      = ""
+			ZoneFile      = "blob.local.azurestack.external.dns"
 			DynamicUpdate = "None"
 		}
 		
