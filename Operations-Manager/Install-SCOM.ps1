@@ -29,9 +29,18 @@ param (
         [string]$MsiSASToken,
         [string]$DefaultPassword = "Password12345"
       )
-      
-$ErrorActionPreference = "Stop"
 
+
+function Write-LogEntry{
+    param(
+        $Message
+    )
+    Add-Content -Path "$env:Temp\install-Scom-log.txt" -Value $Message
+}
+
+
+$ErrorActionPreference = "Stop"
+Write-LogEntry "Starting process"
 # For logging purposes - remove file in the end of deployment
 Start-Transcript -Path "$env:TEMP\Install-SCOM.log" -NoClobber -Force -Append
 
@@ -69,7 +78,7 @@ $sqlSCOMOpsDBLogSize = "2GB"
 $sqlSCOMOpsDWDataSize = "10GB"
 $sqlSCOMOpsDWLogSize = "2GB"
 #endregion
-
+Write-LogEntry "Preparation - Static variables - Complete"
 #region Create Users
     $DomainDetails = (Get-WMIObject Win32_NTDomain)
     [string]$DCName = $DomainDetails.DomainControllerName
@@ -80,7 +89,7 @@ $sqlSCOMOpsDWLogSize = "2GB"
 
     $UsersToCreate = @($SQLSvcAccountName,$SQLAgtSvcAccountName,$SQLRssSvcAccountName,$SCOMActionAccountName,$SCOMDataAccessAccountName,$SCOMDataReaderAccountName,$SCOMDataWriterAccountName)
     $UserString = $UsersToCreate -join ";"
-    
+    Write-LogEntry "Creating users: $UserString"
 
     $CreatedUsers = Invoke-Command -ComputerName $DCName -Credential $domainCreds -ScriptBlock {
         param(
@@ -106,7 +115,8 @@ $sqlSCOMOpsDWLogSize = "2GB"
 
 
     } -ArgumentList $UserString,$DNSForestName,$DefaultPassword
-
+    Write-LogEntry "Users created"
+    Write-LogEntry "Adding $SCOMActionAccountName to Domain Admins"
     $AddToDomainAdmins = Invoke-Command -ComputerName $DCName -Credential $domainCreds -ScriptBlock {
         param(
             $AccAccount,
@@ -119,7 +129,7 @@ $sqlSCOMOpsDWLogSize = "2GB"
 
 #endregion
 
-
+Write-LogEntry "Storage Pools"
 #region OS - Create Storage Pool and virtual disks
 
 $spName = 'SP-SCOM01'
@@ -193,7 +203,7 @@ else {
     Write-Output "Virtual disk - $vdName exists"
 }
 #endregion
-
+Write-LogEntry "Local Dirs"
 #region OS - Create local directories
 # ------------------------------------
 # Create SCOM Binaries directory
@@ -260,7 +270,7 @@ else {
     Write-Output "Directory - '$sqlTempDBDir' exists"
 }
 #endregion
-
+Write-LogEntry "Downloading SQL Binaries"
 #region SQL - Download and extract the installer binaries
 $Web = New-Object System.Net.WebClient
 If (-not(Test-Path -Path "$sqlBinariesDir\SQLServer2016.iso")) {
@@ -288,12 +298,12 @@ else {
 }
 
 #endregion
-
+Write-LogEntry "Installing SQL Windows Features"
 #region SQL - Install Windows Features
 Write-Output "SQL - Install Windows Features"
 Add-WindowsFeature NET-Framework-Core, NET-Framework-45-Core
 #endregion
-
+Write-LogEntry "Setting local admin"
 #region SQL - Add domain account to local Administrators group 
 $ErrorActionPreference = "SilentlyContinue"
     Write-Output "Add domain account to local Administrators group"
@@ -304,7 +314,7 @@ $ErrorActionPreference = "Stop"
 #endregion
 
 #region SQL - Install SQL Management Studio 2016
-
+Write-LogEntry "Installing SSMS"
 if (-not(Get-ItemProperty "HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where-Object {$_.DisplayName -eq "SQL Server 2016 Management Studio"})) {
     Write-Output "Install SQL Management Studio 2016"
 
@@ -334,7 +344,7 @@ else {
     Write-Output "SQL Server Management Studio is installed"
 }
 #endregion
-
+Write-LogEntry "Mount SQL ISO"
 #region SQL - Mount SQL Server ISO and get the drive letter
 $isoPath = "$sqlBinariesDir\SQLServer2016.iso"
 if (-not($(Get-DiskImage -ImagePath $isoPath).Attached)) {
@@ -346,7 +356,7 @@ else {
     Write-Output "ISO file '$isoPath' is attached"
 }
 #endregion
-
+Write-LogEntry "Install SQL"
 #region SQL - Install and configure SQL Server 2016
 $sqlService = "MSSQL`$$sqlInstanceName"
 if (-not(Get-Service $sqlService -ErrorAction SilentlyContinue)) {
@@ -396,7 +406,7 @@ else {
     Write-Output "SQL Server is installed"
 }
 #endregion
-
+Write-LogEntry "SQL Temp Folder"
 #region SQL - Create scheduled task to recreate SQLTemp folder after machine reboot
 Write-Output "SQL - Create scheduled task to recreate SQLTemp folder after machine reboot"
 
@@ -453,7 +463,7 @@ else {
     Write-Output "SQL Server port is set to 1433"
 }
 #endregion
-
+Write-LogEntry "SQL Post Install"
 #region SQL - SQL Post installation steps
 $scriptFileContent = @"
 `$ErrorActionPreference = "Stop"
@@ -542,7 +552,7 @@ else{
     Write-Output "Scheduled task '$scheduledTaskName' exists"
 }
 #endregion
-
+Write-LogEntry "Download SCOM"
 #region SCOM - Download and extract the installer binaries
 $Web = New-Object System.Net.WebClient
 If (-not(Test-Path -Path "$scomBinariesDir\OpsMgr2016.iso")) {
@@ -567,12 +577,12 @@ else {
     Write-Output "File - '$scomBinariesDir\PreReq\ReportViewer.msi' exists"
 }
 #endregion
-
+Write-LogEntry "Install SCOM Windows Features"
 #region SCOM - Install Windows Features
 Write-Output "SCOM - Install Windows Features"
 Add-WindowsFeature Web-Server, Web-WebServer, Web-Common-Http, Web-Default-Doc, Web-Dir-Browsing, Web-Http-Errors, Web-Static-Content, Web-Health, Web-Http-Logging, Web-Log-Libraries, Web-Request-Monitor, Web-Performance, Web-Stat-Compression, Web-Security, Web-Filtering, Web-Windows-Auth, Web-App-Dev, Web-Net-Ext45, Web-Asp-Net45, Web-ISAPI-Ext, Web-ISAPI-Filter, Web-Mgmt-Tools, Web-Mgmt-Console, Web-Mgmt-Compat, Web-Metabase, NET-Framework-45-Features, NET-Framework-45-Core, NET-Framework-45-ASPNET, NET-WCF-Services45, NET-WCF-HTTP-Activation45, NET-WCF-TCP-PortSharing45, WAS, WAS-Process-Model, WAS-Config-APIs, Web-Asp-Net
 #endregion
-
+Write-LogEntry "Install SCOM Prerequisites"
 #region SCOM - Install Prerequisites
 if (-not(Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where-Object {$_.DisplayName -eq "Microsoft System CLR Types for SQL Server 2014"})) {
     Write-Output "SCOM - Install Prerequisites - Microsoft System CLR Types"
@@ -621,7 +631,7 @@ else {
 }
 
 #endregion 
-
+Write-LogEntry "Register IIS Changes"
 #region SCOM - Register IIS
 Write-Output "SCOM - Register ASPNET IIS"
 Start-Process -FilePath "$env:windir\Microsoft.NET\Framework64\v4.0.30319\aspnet_regiis.exe" -ArgumentList "-r" -Wait
@@ -650,7 +660,7 @@ $ErrorActionPreference = "SilentlyContinue"
     $Group.Add($User.Path)
 $ErrorActionPreference = "Stop"
 #endregion
-
+Write-LogEntry "Extract and Install SCOM"
 #region SCOM - Install SCOM
 Write-Output "Install SCOM"
 $installSCOMScript = @"
@@ -734,7 +744,7 @@ else {
 
 Dismount-DiskImage -ImagePath "$scomBinariesDir\OpsMgr2016.iso"
 #endregion
-
+Write-LogEntry "Optimize SCOM"
 #region SCOM - Optimize SCOM
 Write-Output "SCOM - Apply registry optimizations"
 reg add "HKLM\SYSTEM\CurrentControlSet\services\HealthService\Parameters" /v "State Queue Items" /t REG_DWORD /d 20480 /f
@@ -823,6 +833,7 @@ else{
 #endregion    
 
 #region SCOM - reboot server
+Write-LogEntry "Complete"
 Write-Output "Reboot server"
 Restart-Computer -Force 
 #endregion
