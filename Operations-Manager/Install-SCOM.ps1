@@ -24,9 +24,6 @@ param (
         [String]$DomainUserName="DemoAdmin",
         [Parameter(Mandatory=$False)]
         [String]$DomainUserPassword="Password12345",
-        [string]$IsoSASToken,
-        [string]$ExeSASToken,
-        [string]$MsiSASToken,
         [string]$DefaultPassword = "Password12345"
       )
 
@@ -60,14 +57,14 @@ $sqlBinariesDir = "C:\Install\SQL"
 $scomBinariesDir = "C:\Install\SCOM"
 $scomDir = "F:\Program Files"
 
-$scomIsoFileUrl = ("https://samslmedia.blob.local.azurestack.external/iso/SCOM-2016-RTM.iso" + $IsoSASToken)
-$sqlSysClrFileUrl = ("https://samslmedia.blob.local.azurestack.external/msi/SQLSysClrTypes.msi" + $MsiSASToken)
-$reportViewerFileUrl = ("https://samslmedia.blob.local.azurestack.external/msi/ReportViewer.msi" + $MsiSASToken)
+$scomIsoFileUrl = ("https://samslmedia.blob.local.azurestack.external/iso/SCOM-2016-RTM.iso")
+$sqlSysClrFileUrl = ("https://samslmedia.blob.local.azurestack.external/msi/SQLSysClrTypes.msi")
+$reportViewerFileUrl = ("https://samslmedia.blob.local.azurestack.external/msi/ReportViewer.msi")
 
 
 
-$sqlServerUrl = ("https://samslmedia.blob.local.azurestack.external/iso/SQLServer2016SP1-FullSlipstream-x64-ENU.iso" + $IsoSASToken)
-$sqlServerManagementStudioUrl = ("https://samslmedia.blob.local.azurestack.external/exe/SSMS-Setup-ENU.exe" + $ExeSASToken)
+$sqlServerUrl = ("https://samslmedia.blob.local.azurestack.external/iso/SQLServer2016SP1-FullSlipstream-x64-ENU.iso")
+$sqlServerManagementStudioUrl = ("https://samslmedia.blob.local.azurestack.external/exe/SSMS-Setup-ENU.exe")
 $UserRightsUrl = "https://gallery.technet.microsoft.com/scriptcenter/Grant-Revoke-Query-user-26e259b0/file/169808/1/UserRights.ps1"
 
 Write-LogEntry -Message "SQL URL: $sqlServerUrl"
