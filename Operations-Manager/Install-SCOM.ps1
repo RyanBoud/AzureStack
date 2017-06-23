@@ -85,7 +85,8 @@ $sqlSCOMOpsDWLogSize = "2GB"
     $CreatedUsers = Invoke-Command -ComputerName $DCName -Credential $domainCreds -ScriptBlock {
         param(
             [string]$UserString,
-            [string]$DNSForestName
+            [string]$DNSForestName,
+            [string]$DefaultPassword
         )
         $UsersToCreate = $UserString -split ";"
         $DomainName = $DNSForestName
@@ -104,7 +105,7 @@ $sqlSCOMOpsDWLogSize = "2GB"
         }
 
 
-    } -ArgumentList $UserString,$DNSForestName
+    } -ArgumentList $UserString,$DNSForestName,$DefaultPassword
 
     $AddToDomainAdmins = Invoke-Command -ComputerName $DCName -Credential $domainCreds -ScriptBlock {
         param(
