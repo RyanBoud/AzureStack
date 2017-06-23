@@ -11,6 +11,9 @@
 		[Parameter(Mandatory)]
 		[string]$SaMslMediaIP,
 
+        [Parameter(Mandatory)]
+        [string]$AdminManagementIP,
+
         [Int]$RetryCount=20,
         [Int]$RetryIntervalSec=30
     ) 
@@ -62,16 +65,25 @@
 		xDnsServerPrimaryZone addPrimaryZone
 		{
 			Ensure        = 'Present'
-			Name          = "blob.local.azurestack.external"
-			ZoneFile      = "blob.local.azurestack.external.dns"
+			Name          = "local.azurestack.external"
+			ZoneFile      = "local.azurestack.external.dns"
 			DynamicUpdate = "None"
 		}
 		
 		xDnsRecord TestRecord
 		{
-			Name = "samslmedia"
+			Name = "samslmedia.blob"
 			Target = $SaMslMediaIP
-			Zone = "blob.local.azurestack.external"
+			Zone = "local.azurestack.external"
+			Type = "ARecord"
+			Ensure = "Present"
+		}
+
+        xDnsRecord TestRecord2
+		{
+			Name = "adminmanagement"
+			Target = $AdminManagementIP
+			Zone = "local.azurestack.external"
 			Type = "ARecord"
 			Ensure = "Present"
 		}
