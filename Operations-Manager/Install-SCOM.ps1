@@ -1,30 +1,30 @@
 ﻿[cmdletbinding()]
 param (
         [Parameter(Mandatory=$False)]
-        [String]$SQLAdminName="saadm",
+        [String]$SQLAdminName,
         [Parameter(Mandatory=$False)]
-        [String]$SQLSvcAccountName="sqlsvc",
+        [String]$SQLSvcAccountName,
         [Parameter(Mandatory=$False)]
-        [String]$SQLAgtSvcAccountName="sqlagtsvc",
+        [String]$SQLAgtSvcAccountName,
         [Parameter(Mandatory=$False)]
-        [String]$SQLRssSvcAccountName="sqlrsssvc",
+        [String]$SQLRssSvcAccountName,
         [Parameter(Mandatory=$False)]
-        [String]$SCOMManagementGroup="SCOM01MGMT",
+        [String]$SCOMManagementGroup,
         [Parameter(Mandatory=$False)]
-        [String]$SCOMActionAccountName="scomacc",
+        [String]$SCOMActionAccountName,
         [Parameter(Mandatory=$False)]
-        [String]$SCOMDataAccessAccountName="scomdaa",
+        [String]$SCOMDataAccessAccountName,
         [Parameter(Mandatory=$False)]
-        [String]$SCOMDataReaderAccountName="scomdra",
+        [String]$SCOMDataReaderAccountName,
         [Parameter(Mandatory=$False)]
-        [String]$SCOMDataWriterAccountName="scomdwa",
+        [String]$SCOMDataWriterAccountName,
         [Parameter(Mandatory=$False)]
-        [String]$DomainName="ad.contoso.com",
+        [String]$DomainName,
         [Parameter(Mandatory=$False)]
-        [String]$DomainUserName="DemoAdmin",
+        [String]$DomainUserName,
         [Parameter(Mandatory=$False)]
-        [String]$DomainUserPassword="Password12345",
-        [string]$DefaultPassword = "Password12345"
+        [String]$DomainUserPassword,
+        [string]$DefaultPassword
       )
 
 
@@ -35,6 +35,7 @@ function Write-LogEntry{
     Add-Content -Path "$env:Temp\install-Scom-log.txt" -Value $Message
 }
 
+Write-LogEntry ($PSBoundParameters | Out-String)
 
 $ErrorActionPreference = "Stop"
 Write-LogEntry "Starting process"
@@ -379,7 +380,7 @@ if (-not(Get-Service $sqlService -ErrorAction SilentlyContinue)) {
     $sqlRsMode="DefaultNativeMode"
 
     $ProcessName = "$($DriveLetter)\Setup.exe"
-    $sqlArgs =  "/Quiet='True' /ACTION='Install' /FEATURES='$sqlFeatures' /INSTANCENAME='$sqlInstanceName' /INSTANCEID='$sqlInstanceName' /SQLCOLLATION='$sqlCollation' /INSTALLSQLDATADIR='$sqlDataDir' /SQLUSERDBDIR='$sqlUserDBDir' /SQLUSERDBLOGDIR='$sqlUserDBLogDir' /SQLBACKUPDIR='$sqlBackupsDir' /SQLTEMPDBDIR='$sqlTempDBDir' /SQLTEMPDBLOGDIR='$sqlTempDBDir' /RSINSTALLMODE='$sqlRsMode' /SQLSYSADMINACCOUNTS='$SQLAdminName' /SQLSVCACCOUNT='$SQLSvcAccountName' /SQLSVCPASSWORD='$SQLSvcAccountPassword' /AGTSVCACCOUNT='$SQLAgtSvcAccountName' /AGTSVCPASSWORD='$SQLAgtSvcAccountPassword' /RSSVCACCOUNT='$SQLRssSvcAccountName' /RSSVCPASSWORD='$SQLRssSvcAccountPassword' /IACCEPTSQLSERVERLICENSETERMS /UpdateEnabled='FALSE'"
+    $sqlArgs =  "/Quiet='True' /ACTION='Install' /FEATURES='$sqlFeatures' /INSTANCENAME='$sqlInstanceName' /INSTANCEID='$sqlInstanceName' /SQLCOLLATION='$sqlCollation' /INSTALLSQLDATADIR='$sqlDataDir' /SQLUSERDBDIR='$sqlUserDBDir' /SQLUSERDBLOGDIR='$sqlUserDBLogDir' /SQLBACKUPDIR='$sqlBackupsDir' /SQLTEMPDBDIR='$sqlTempDBDir' /SQLTEMPDBLOGDIR='$sqlTempDBDir' /RSINSTALLMODE='$sqlRsMode' /SQLSYSADMINACCOUNTS='$SQLAdminName' /SQLSVCACCOUNT='$SQLSvcAccountName' /SQLSVCPASSWORD='$DefaultPassword' /AGTSVCACCOUNT='$SQLAgtSvcAccountName' /AGTSVCPASSWORD='$DefaultPassword' /RSSVCACCOUNT='$SQLRssSvcAccountName' /RSSVCPASSWORD='$DefaultPassword' /IACCEPTSQLSERVERLICENSETERMS /UpdateEnabled='FALSE'"
 
     $command = "$ProcessName $sqlArgs"
 
@@ -698,7 +699,7 @@ If (`$(`$process.ExitCode) -ne "0") {
 
 `#SCOM - Install Operations Manager Management Server
 `$ProcessName = "C:\install\scom\setup.exe"
-`$Argumentlist = "/silent /install /components:``"OMServer,OMConsole,OMWebConsole,OMReporting``" /InstallPath:``"$scomDir\Microsoft System Center 2016\Operations Manager``" /ManagementGroupName:``"$SCOMManagementGroup``" /SqlServerInstance:``"$env:COMPUTERNAME\$sqlInstanceName``" /DatabaseName:``"OperationsManager``" /DWSqlServerInstance:``"$env:COMPUTERNAME`\$sqlInstanceName``" /DWDatabaseName:``"OperationsManagerDW``" /ActionAccountUser:``"$DomainName`\$SCOMActionAccountName``" /ActionAccountPassword:``"$SCOMActionAccountPassword``" /DASAccountUser:``"$DomainName`\$SCOMDataAccessAccountName``" /DASAccountPassword:``"$SCOMDataAccessAccountPassword``" /DataReaderUser:``"$DomainName`\$SCOMDataReaderAccountName``" /DataReaderPassword:``"$SCOMDataReaderAccountPassword``" /DataWriterUser:``"$DomainName`\$SCOMDataWriterAccountName``" /DataWriterPassword:``"$SCOMDataWriterAccountPassword``" /WebSiteName:``"Default Web Site``" /WebConsoleAuthorizationMode:``"Mixed``" /SRSInstance:``"$env:COMPUTERNAME`\$sqlInstanceName``" /SendODRReports:0 /EnableErrorReporting:``"Never``" /SendCEIPReports:0 /UseMicrosoftUpdate:0 /AcceptEndUserLicenseAgreement:1"
+`$Argumentlist = "/silent /install /components:``"OMServer,OMConsole,OMWebConsole,OMReporting``" /InstallPath:``"$scomDir\Microsoft System Center 2016\Operations Manager``" /ManagementGroupName:``"$SCOMManagementGroup``" /SqlServerInstance:``"$env:COMPUTERNAME\$sqlInstanceName``" /DatabaseName:``"OperationsManager``" /DWSqlServerInstance:``"$env:COMPUTERNAME`\$sqlInstanceName``" /DWDatabaseName:``"OperationsManagerDW``" /ActionAccountUser:``"$DomainName`\$SCOMActionAccountName``" /ActionAccountPassword:``"$DefaultPassword``" /DASAccountUser:``"$DomainName`\$SCOMDataAccessAccountName``" /DASAccountPassword:``"$DefaultPassword``" /DataReaderUser:``"$DomainName`\$SCOMDataReaderAccountName``" /DataReaderPassword:``"$DefaultPassword``" /DataWriterUser:``"$DomainName`\$SCOMDataWriterAccountName``" /DataWriterPassword:``"$DefaultPassword``" /WebSiteName:``"Default Web Site``" /WebConsoleAuthorizationMode:``"Mixed``" /SRSInstance:``"$env:COMPUTERNAME`\$sqlInstanceName``" /SendODRReports:0 /EnableErrorReporting:``"Never``" /SendCEIPReports:0 /UseMicrosoftUpdate:0 /AcceptEndUserLicenseAgreement:1"
 
 `$pInfo = New-Object System.Diagnostics.ProcessStartInfo
 `$pInfo.FileName = `$ProcessName
@@ -740,13 +741,13 @@ Start-Sleep -s 5
 $TaskDetails = Get-ScheduledTaskInfo $scheduledTaskName
 If ($($TaskDetails.LastTaskResult) -ne "0") {
     Unregister-ScheduledTask -TaskName $scheduledTaskName -Confirm:$false
-    Remove-Item "$env:TEMP\installSCOM.ps1" -Force
+    Remove-Item "C:\Install\installSCOM.ps1" -Force
     Throw "Operations Manager installation failed"
 }
 else {
     Write-Output "Operations Manager installation ok"
     Unregister-ScheduledTask -TaskName $scheduledTaskName -Confirm:$false
-    Remove-Item "$env:TEMP\installSCOM.ps1" -Force
+    Remove-Item "C:\Install\installSCOM.ps1" -Force
 }
 
 Dismount-DiskImage -ImagePath "$scomBinariesDir\OpsMgr2016.iso"
