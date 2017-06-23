@@ -64,9 +64,19 @@ $scomIsoFileUrl = ("https://samslmedia.blob.local.azurestack.external/iso/SCOM-2
 $sqlSysClrFileUrl = ("https://samslmedia.blob.local.azurestack.external/msi/SQLSysClrTypes.msi" + $MsiSASToken)
 $reportViewerFileUrl = ("https://samslmedia.blob.local.azurestack.external/msi/ReportViewer.msi" + $MsiSASToken)
 
+
+
 $sqlServerUrl = ("https://samslmedia.blob.local.azurestack.external/iso/SQLServer2016SP1-FullSlipstream-x64-ENU.iso" + $IsoSASToken)
 $sqlServerManagementStudioUrl = ("https://samslmedia.blob.local.azurestack.external/exe/SSMS-Setup-ENU.exe" + $ExeSASToken)
 $UserRightsUrl = "https://gallery.technet.microsoft.com/scriptcenter/Grant-Revoke-Query-user-26e259b0/file/169808/1/UserRights.ps1"
+
+Write-LogEntry -Message "SQL URL: $sqlServerUrl"
+Write-LogEntry -Message "SCOM URL: $scomIsoFileUrl"
+Write-LogEntry -Message "RV URL: $reportViewerFileUrl"
+Write-LogEntry -Message "CLR URL: $sqlSysClrFileUrl"
+Write-LogEntry -Message "SMMS URL: $sqlServerManagementStudioUrl"
+Write-LogEntry -Message "USR URL: $UserRightsUrl"
+
 
 $VDiskSCOMBinariesSize = 20GB
 $VDiskSQLDataSize = 50GB
